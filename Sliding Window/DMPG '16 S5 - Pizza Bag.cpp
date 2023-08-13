@@ -1,5 +1,7 @@
-// Source: https://usaco.guide/general/io
+/*
 
+Matthew Yu
+	*/
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
