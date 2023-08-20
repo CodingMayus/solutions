@@ -1,0 +1,1 @@
+Profile  DP:Profile DP: Dp on profiles:  Iterating on grid and transitioning column by column by only looking at the previous column state.    "Profile" is the word for the column bitmask for these profiles.
