@@ -8,6 +8,9 @@ const int MOD = 1e9 +7;
 const int mx = 1<<10+5;
 const int INF = 1e3+5;
 //today profile dp
+/*
+Matthew YU
+	*/
 //state: # of ways to fill up a i j rectangle with a mask arrangment.
 //first k columns with an arrangment of 1010111
 //unoptimized i.e.  Didnt precalculate the boolean comp --> So that we dont need to recheck.
