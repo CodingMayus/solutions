@@ -10,6 +10,7 @@ const int INF = 1e3+5;
 //today profile dp
 /*
 Matthew YU
+TLE last few cases
 	*/
 //state: # of ways to fill up a i j rectangle with a mask arrangment.
 //first k columns with an arrangment of 1010111
