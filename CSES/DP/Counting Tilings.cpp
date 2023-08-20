@@ -8,78 +8,79 @@ const int MOD = 1e9 +7;
 const int mx = 1<<10+5;
 const int INF = 1e3+5;
 //today profile dp
-/*
-Matthew YU
-TLE last few cases
-	*/
-//state: # of ways to fill up a i j rectangle with a mask arrangment.
+//state: # of ways to fill up first i-1 columns with a mask arrangment ( protruding tiles from column i-1) on i.
 //first k columns with an arrangment of 1010111
-//unoptimized i.e.  Didnt precalculate the boolean comp --> So that we dont need to recheck.
+//optimized i.e.   precalculate the boolean comp --> So that we dont need to recheck at its iteration.
+//Unoptimized: https://cses.fi/paste/d3bef8c631c7b29d6879ac/
 ll dp[mx][INF];
-int  comp(ll x,ll xp){
-
-	//see if its compliable.
-	//1) i can only be 1 if the previous isn't --> with first condition thus we can consider only the subsets of ( if the previous was 10011) then 01100 whhhhhhhhhhhhhhhhhhhhhhhhhhhha heeee
-	//2) if two consutetive 0's --> vertical piece is possible.
-	//else if just 1 the current has to be a 1
-	// for(int i=0;i<n;i++){
-	// 	//go through each bit
-	// if((1&(x>>i))&&(1&(xp>>i))){
-	// 	//not possible.
-	// 	return 0;
-	// }
-	
-	// }
-	//now consider the second condition.
-		int  left = (~x)&(~xp);	
-	//values remaining are the 0s in both x and x`.
-	int last =-1;
-	//--> least signficiant bit (rightmost bit) in the segment.
-	//-1 means no segment being tracked 
-	for(int k=0;k<n;k++){
-		if(1&(left>>k)){
-				if(last==-1){
-					last=k;
-				}
-		}else{ 
-			if(last!=-1){
-		int length = k-last;
-		if(length%2!=0){
-			return 0;
-		}
-			}
-		last=-1;
-			//if even length segment we know its possible for vertical..
-			//if its odd its not.
-		}
-	}
-	//what if the segment runs throughout without actually stopping
-	if(last!=-1){
-		//check
-
-		int length = n-last;
-		if(length%2!=0){
-			return 0;
-		}
-	}
-	return 1;
-}
+bool comp[mx][mx];
 //with a width of 1-10, it is evident that 1<<10 is not that big, indicating that it is possible to stack
 //the following in a nested loops.  Influencing our solution
 int main() {
 cin>>n>>m;	
 dp[0][1]=1;
+//precompute values so that you dont need to calculate them again in
+//O((2^n*n))time,--> around 10^7  gud
+for(int i=0;i<(1<<n);i++){
+	for(int j=0;j<(1<<n);j++){
+		bool check = 1;
+		//1-->true
+		//0-->false
+		int left = ~(i)&~(j);
+	//remaining 1s are the inactive bits --> tbh unnecessary but conventient.
+		int last =-1;
+		//if not -1 --> tracking a segment length --> if odd unable to fill/ if even --> able
+		//if -1 --> currenting not tracking segment
+		for(int g = 0;g<n;g++){
+				if((left>>g)&1){
+						if(last==-1){
+							last =g;
+						}
+				}else{
+					//if -1 originally then there is no segment
+					if(last!=-1){
+						int length = g-last;
+						if(length%2==0)
+				{	
+					check &= 1;
+	//if its still true then lket it continue to be
+	//if not, it doesnt update!
+
+				}	else{
+				check =0;
+			}					
+					}
+					last =-1;
+					//reset to find next segment.
+				}
+		}
+		//if never encounter a 0 in the "left" mask, then we have to check for that.
+		if(last !=-1){
+			int length = n-last;
+			if(length%2==0){
+				check&=1;
+				
+						//even length
+			}else{
+				check =0;
+			}
+		}
+		comp[i][j]=check;
+	}
+
+}
 for(int i=2;i<=m+1;i++){
 		for(int k=0;k<(1<<n);k++){
 			//only try the subsets of ~(X)in regards to the first condition.
 			//g is because just doing ~(X) --> means that the leading 0s will yield 1s.  
 			//such AND function removes the unnecessary 0s.
 			int lol = (~k)&((1<<n)-1);
+			//it is clear that comp[i][j]=comp[j][i].  ordering legit no matter.
 			for(int g=lol;g;g=(g-1)&lol){
-				dp[k][i]=(MOD+dp[k][i]+dp[g][i-1]*comp(k,g))%MOD;
+				dp[k][i]=(MOD+dp[k][i]+dp[g][i-1]*comp[k][g])%MOD;
 				// dp[k][i]=dp[k][i]+dp[g][i-1];
 			}
-			dp[k][i]=(dp[k][i]+MOD+dp[0][i-1]*comp(k,0))%MOD; //our previous for loop doesnt go over mask 0, so we have to check it mannually
+			dp[k][i]=(dp[k][i]+MOD+dp[0][i-1]*comp[k][0])%MOD; //our previous for loop doesnt go over mask 0, so we have to check it mannually
             dp[k][i]%=MOD;
 		}
 		 
