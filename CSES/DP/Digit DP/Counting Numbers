@@ -1,0 +1,61 @@
+// Source: https://usaco.guide/general/io
+
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+ll dp[20][10][2][2];
+string num;
+//pos, previous digit, tight, leading zeros.
+void seter(){
+	for(int i=0;i<20;i++){
+		for(int j=0;j<10;j++){
+			for(int l=0;l<2;l++){
+				for(int r =0;r<2;r++){
+					dp[i][j][l][r]=-1;
+		//			cout<<dp[i][j][l][r]<<"\n";
+				}
+			}
+		}
+	}
+}
+ll solve(int pos,int prev, bool tight, bool leading ){
+//cout<<pos<<" "<<prev<<" "<<tight<<" "<<leading<<"\n";
+if(pos==num.size()){
+	return 1;
+}
+
+int val = num[pos]-'0';
+int upper = tight?val:9;
+	ll res=0;
+	
+ if(prev!=-1&&dp[pos][prev][tight][leading]!=-1){return dp[pos][prev][tight][leading];}
+
+for(int i=0;i<=upper;i++){
+	bool new_tight = tight&&(i==upper);
+	bool new_leading= leading&&i==0;
+		//pos - still leading 0s, still can be 0. 
+	int new_prev = i;
+	if(prev==i&&!leading){
+		continue;
+	}
+	res+=solve(pos+1,new_prev,new_tight,new_leading);
+
+}
+return dp[pos][prev][tight][leading]=res;
+}
+int main() {
+
+
+	ll a,b;
+	cin>>a>>b;
+	seter();
+		num = to_string(b);
+		//cout<<num<<"\n";
+		ll temp = solve(0,-1,true,true);
+		a--;
+		num = to_string(a);
+		seter();
+		temp -= solve(0,-1,true,true);
+
+		cout<<temp<<"\n";
+}
