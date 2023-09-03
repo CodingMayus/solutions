@@ -1,0 +1,169 @@
+// Source: https://usaco.guide/general/io
+
+#include <bits/stdc++.h>
+using namespace std;
+
+//recurrence
+typedef long long ll;
+ll dp[100][50][2][2];
+ll numberodigits;
+//digit,cnt, tight, lead
+
+//we consider each digit as the number that occurs at least half of times.
+//make sure to :
+//1) remove duplicates ( simple)
+//2) reset array ( simple ); 
+//lead -> leading zeros
+//!lead-> no leading zeros to consider
+
+
+//for some reason the:   conditional?true:false
+//when i did it was wrong. Lets first do the trival/messier 
+//way before more organized.
+
+
+string x,y;
+ll  digitfocus;
+ll digitfocus2;
+ll  solve(ll idx, ll k, bool tight,bool leading){
+
+//cout<<idx<<" "<<k<<"\n";
+if(idx ==numberodigits){
+
+if(leading){return 0;}
+if(k>=20){return 1;}
+else{return 0;}
+
+
+}
+
+if(dp[idx][k][tight][leading]!=-1){return dp[idx][k][tight][leading];}
+
+ll upperdigit = tight?y[idx]-'0':9;
+//cout<<idx<<" "<<upperdigit<<"\n";
+// dp[idx][k][tight][leading]=0;
+ll temp=0;
+
+int val = y[idx]-'0';
+for(int i=0;i<=9;i++){
+//	cout<<i<<"\n";
+	// int new_k =k;
+	// if(!leading){
+	// 	if(k==digitfocus){
+	// 		new_k=k+1;
+	// 	}else new_k=k-1;
+	// }
+	//,
+	if(tight&&i>val)break;
+	bool new_tight = tight;
+	if(i<val){new_tight = false;}
+	bool new_leaded = leading&&i==0;
+	int new_k =k;
+	if(!new_leaded){ 
+		if(i==digitfocus){
+			new_k=k+1;
+		}else new_k=k-1;
+	}
+	temp+=solve(idx+1,new_k,new_tight,new_leaded);
+}
+
+return dp[idx][k][tight][leading]=temp;
+}
+void reset(){
+
+	for(int i=0;i<100;i++){
+		for(int j=0;j<50;j++){
+			for(int g=0;g<2;g++){
+				for(int k=0;k<2;k++){
+					dp[i][j][g][k]=-1;
+				}
+			}
+		}
+	}
+}
+ll duplicate(int idx, int k,bool tight, bool leading){
+	// for duplicates --> only possible for duplicates for even lengths
+	// equal amount of occurences as a second number
+	// we can use the dp array --> # of values where equal number of k and k2 
+	if(idx==numberodigits){
+		//cout<<k<<"\n";
+		if(leading){return 0;}
+		 if(k==20){return 1;}
+		else{return 0;}
+		//means an equal amount of etwo elements
+	}
+	if (dp[idx][k][tight][leading] != -1) { return dp[idx][k][tight][leading]; }
+
+	ll  temp=0;
+	//cout<<upperdigit<<"\n";
+	int val = y[idx]-'0';
+	for(int i=0;i<=9;i++){
+		
+		if(tight&&i>val)break;
+
+		bool new_tight = tight;
+		if(i<val){
+			new_tight = false;
+		}
+		bool new_leaded = leading&&i==0;
+			if(!new_leaded&&i!=digitfocus2&&i!=digitfocus){
+			//dont care about other digits.
+			//cout<<i<<"\n";
+			continue;
+		}
+		int new_k=k;
+	//ifnew_k isnt digitfocus, it means that the digitfoc1us2 cnt is plus 1,
+	//meaning more digitfoucs 2 than digitfoucs 1,
+	//we can display this as:
+	//new_k=k-1;
+	if(!new_leaded){
+		if(digitfocus ==i){
+				new_k=k+1;
+		}else new_k=k-1;
+	}
+	//cout<<new_k<<"\n";
+	temp +=duplicate(idx+1,new_k,new_tight,new_leaded);
+	}
+	return dp[idx][k][tight][leading]=temp;
+	}
+ll answer(){
+ll res =0;
+ 	 numberodigits = y.size();
+for(int i=0;i<10;i++){
+	reset();
+	digitfocus = i;
+res+=solve(0,20,true,true);
+}
+ return res;}
+ ll duplic(){
+	 numberodigits = y.size();
+	 ll res =0;
+	 for(int i=0;i<10;i++){
+		 for(int j=0;j<10;j++){
+			 reset();
+			 digitfocus = i;
+			 digitfocus2= j;
+			 res+=duplicate(0,20,true,true);
+		 }
+	 }
+	 return res;
+ }
+int main() {
+	freopen("odometer.in", "r", stdin);
+	freopen("odometer.out", "w", stdout);
+	ll inp1,inp2;
+	cin>>inp1>>inp2;
+			inp1--;
+	y = to_string(inp2);
+	ll lol=	answer();
+	ll xd= duplic();
+	ll ans1 = lol -xd/2;
+	
+//	cout<<ans1<<"\n";
+
+	y = to_string(inp1);
+		lol = answer();
+		xd = duplic();
+		ll ans2 = lol- xd/2;
+cout<<ans1-ans2<<"\n";
+}
