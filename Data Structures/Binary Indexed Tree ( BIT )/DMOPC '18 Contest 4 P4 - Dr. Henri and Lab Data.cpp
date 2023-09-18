@@ -1,4 +1,8 @@
-// Source: https://usaco.guide/general/io
+/*
+
+Matthew Yu
+Offline Query + Value BIT
+	*/
 
 #include <bits/stdc++.h>
 using namespace std;
